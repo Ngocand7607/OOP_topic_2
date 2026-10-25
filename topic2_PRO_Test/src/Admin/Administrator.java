@@ -35,10 +35,11 @@ public class Administrator extends Role {
             switch (choice) {
                 case 1:
                     System.out.println("DANH SACH CAC KHOA KHAM ");
+                    exec.hienDanhSachKhoaKham();
                     break;
-
                 case 2:
                     System.out.println("BAO CAO SO LUOT THAM KHAM CUA TUNG KHOA ");
+                    exec.hienSoLuotKhamCacKhoa();
                     break;
                 case 0:
                     System.out.println("CAM ON BAN DA SU DUNG DICH VU!!!");

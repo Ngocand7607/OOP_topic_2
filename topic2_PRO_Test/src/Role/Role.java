@@ -26,8 +26,6 @@ public abstract class Role {
         return roleName;
     }
 
-    // Phương thức Đa hình: Mỗi lớp con sẽ @Override để vẽ menu riêng
     public abstract void showMenu(Scanner sc);
-
 
 }

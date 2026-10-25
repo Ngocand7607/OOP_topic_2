@@ -5,6 +5,8 @@
 package benh_nhan;
 
 import Role.Role;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import thuc_thi.Execute;
 
@@ -14,23 +16,18 @@ import thuc_thi.Execute;
  */
 public class Receptionists extends Role {
 
-    // Thong tin cua benh nhan
     private String name;
     private String bday;
     private String gender;
     private String sickness;
     private String priority;
-    private int ticketNumber; // so thu tu o ve cho
-
-    // Dung khi Receptionists la vai tro Le tan (can goi cac ham nhap lieu cua Execute)
+    private int ticketNumber;
     private Execute exec;
 
-    // Tao 1 benh nhan trong (Execute se nhap thong tin sau)
     public Receptionists() {
         super("Le tan");
     }
 
-    // Tao vai tro Le tan o Main
     public Receptionists(Execute exec) {
         super("Le tan");
         this.exec = exec;
@@ -48,24 +45,30 @@ public class Receptionists extends Role {
     @Override
     public void showMenu(Scanner sc) {
         boolean it = true;
-
         while (it) {
-
-            System.out.println("\n==================================");
-            System.out.println("1. Tiep nhan va dang ky benh nhan moi");
-            System.out.println("2. Hen lich kham");
-            System.out.println("0. Log out");
-            System.out.println("==================================");
+            System.out.println("------------------------------------");
+            System.out.println("| 1. Them benh nhan moi             |");
+            System.out.println("| 2. Hen lich kham cho benh nhan    |");
+            System.out.println("| 3. Xem lich hen kham              |");
+            System.out.println("| 4. Xem thong tin benh nhan        |");
+            System.out.println("| 5. Log out                        |");
+            System.out.println("------------------------------------");
             int choice = exec.readInt("Hay nhap lua chon chuc nang: ");
-
+            
             switch (choice) {
                 case 1:
-                    exec.inputPatientInfo(); // nhap thong tin + in ve cho
+                    exec.inputPatientInfo();
                     break;
                 case 2:
-                    System.out.println("Hen lich kham cho benh nhan");
+                    exec.henLichKham();
                     break;
-                case 0:
+                case 3:
+                    exec.xemLichKham();
+                    break;
+                case 4:
+                    exec.readPatientInfoFromFile();
+                    break;
+                case 5:
                     System.out.println("CAM ON BAN DA SU DUNG DICH VU!!!");
                     it = false;
                     break;

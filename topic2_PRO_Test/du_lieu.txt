@@ -1,0 +1,35 @@
+Thong tin benh nhan:
+--------------------------------
+Ten: ngoc an
+Ngay sinh: 12/12/2012
+Gioi tinh: Nam
+Trieu chung: met moi
+--------------------------------
+Thong tin benh nhan:
+--------------------------------
+Ten: vo duc anh
+Ngay sinh: 12/12/2012
+Gioi tinh: Nam
+Trieu chung: mat ngu
+--------------------------------
+Thong tin benh nhan:
+--------------------------------
+Ten: vo nguyen dang khoa
+Ngay sinh: 23/02/2011
+Gioi tinh: Nam
+Trieu chung: buon ba
+--------------------------------
+Thong tin benh nhan:
+--------------------------------
+Ten: chau gia bao
+Ngay sinh: 23/03/2011
+Gioi tinh: Nam
+Trieu chung: thua can
+--------------------------------
+Thong tin benh nhan:
+--------------------------------
+Ten: thuan
+Ngay sinh: 12/03/2012
+Gioi tinh: Nam
+Trieu chung: dau co do tap ta
+--------------------------------

@@ -17,7 +17,7 @@ public class Doctor extends Role {
     private String doctorName = null;
     private String final_diagnosis = null;
     private String department = null;
-    private Execute exec; // de goi cac ham nhap lieu va xem danh sach cho
+    private Execute exec;
 
     public Doctor(Execute exec) {
         super("Bac si");
@@ -45,7 +45,7 @@ public class Doctor extends Role {
                     exec.showWaitingList();
                     break;
                 case 2:
-                    exec.examinePatient(this); // this = chinh bac si nay
+                    exec.examinePatient(this); 
                     break;
                 case 0:
                     System.out.println("CAM ON BAN DA SU DUNG DICH VU!!!");
