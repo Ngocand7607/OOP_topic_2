@@ -1,0 +1,9 @@
+Thong tin benh nhan:
+--------------------------------
+Ten: ngoc an
+Ngay sinh: 12/02/1999
+Gioi tinh: Nu
+Trieu chung: dau bung
+Muc do uu tien: Emergency
+Chan doan sau cung: ve nha uong thuoc
+--------------------------------
