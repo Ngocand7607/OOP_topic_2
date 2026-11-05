@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java OOP (PRO192) — Quiz Bank</title>
+<style>
+  :root{
+    --ink:#1b2430;
+    --ink-soft:#4b5768;
+    --paper:#ffffff;
+    --bg:#eef1f6;
+    --line:#dde3ec;
+    --navy:#1e3a5f;
+    --navy-deep:#122943;
+    --amber:#c8862b;
+    --amber-soft:#f3e3c9;
+    --good:#2f7d5b;
+    --good-bg:#e4f3ec;
+    --bad:#b8433a;
+    --bad-bg:#fbe9e7;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--ui);
+    line-height:1.5;
+    min-height:100vh;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    background:var(--navy-deep);
+    color:#f2f5f9;
+    padding:22px 28px;
+  }
+  .topbar .inner{
+    max-width:980px;
+    margin:0 auto;
+  }
+  .topbar .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#9db6d4;
+    margin:0 0 6px 0;
+  }
+  .topbar h1{
+    margin:0;
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:26px;
+    letter-spacing:.2px;
+  }
+  .topbar p.sub{
+    margin:8px 0 0 0;
+    color:#c4d1e2;
+    font-size:14px;
+    max-width:640px;
+  }
+
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:30px 28px 80px 28px;
+  }
+
+  /* ---------- Set picker ---------- */
+  .picker-label{
+    font-family:var(--mono);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--ink-soft);
+    margin:0 0 12px 2px;
+  }
+  .set-grid{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:10px;
+    margin-bottom:8px;
+  }
+  @media (max-width:640px){
+    .set-grid{grid-template-columns:repeat(2, 1fr);}
+  }
+  .set-btn{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 10px;
+    text-align:left;
+    cursor:pointer;
+    font-family:var(--ui);
+    transition:border-color .15s ease, transform .1s ease;
+  }
+  .set-btn:hover{border-color:var(--navy); transform:translateY(-1px);}
+  .set-btn .num{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--amber);
+    letter-spacing:.08em;
+  }
+  .set-btn .name{
+    display:block;
+    margin-top:3px;
+    font-weight:600;
+    font-size:14.5px;
+    color:var(--ink);
+  }
+  .set-btn .score{
+    display:block;
+    margin-top:6px;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .set-btn.done{border-color:var(--good);}
+  .set-btn.active{
+    border-color:var(--navy);
+    background:#f5f8fc;
+    box-shadow:inset 0 0 0 1px var(--navy);
+  }
+
+  /* ---------- Quiz panel ---------- */
+  .panel{
+    margin-top:26px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .panel-head{
+    padding:18px 26px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .panel-head h2{
+    margin:0;
+    font-family:var(--sans);
+    font-size:19px;
+    font-weight:600;
+  }
+  .progress-track{
+    display:flex;
+    gap:5px;
+  }
+  .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .dot.answered-correct{background:var(--good); border-color:var(--good);}
+  .dot.answered-wrong{background:var(--bad); border-color:var(--bad);}
+  .dot.current{outline:2px solid var(--navy); outline-offset:2px;}
+
+  .q-body{padding:26px;}
+  .q-tag{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--navy);
+    background:#e8eef7;
+    padding:3px 9px;
+    border-radius:20px;
+    margin-bottom:14px;
+  }
+  .q-text{
+    font-size:18px;
+    line-height:1.5;
+    font-weight:500;
+    margin:0 0 20px 0;
+    color:var(--ink);
+  }
+  .code-block{
+    background:var(--navy-deep);
+    color:#e4ecf7;
+    border-radius:8px;
+    padding:16px 18px;
+    margin:0 0 20px 0;
+    overflow-x:auto;
+    font-family:var(--mono);
+    font-size:13.5px;
+    line-height:1.6;
+    white-space:pre;
+  }
+  .code-block code{
+    font-family:var(--mono);
+    background:none;
+    color:inherit;
+  }
+
+  .ic{
+    font-family:var(--mono);
+    font-size:.88em;
+    background:#e9eef6;
+    color:var(--navy-deep);
+    padding:1px 6px;
+    border-radius:4px;
+  }
+  .code-block .ic{background:none;padding:0;}
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .option{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    text-align:left;
+    width:100%;
+    padding:13px 16px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#fbfcfe;
+    cursor:pointer;
+    font-family:var(--ui);
+    font-size:15px;
+    color:var(--ink);
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .option:hover:not(:disabled){border-color:var(--navy); background:#f3f7fc;}
+  .option .letter{
+    flex:0 0 auto;
+    width:24px;height:24px;
+    border-radius:50%;
+    border:1px solid var(--ink-soft);
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .option:disabled{cursor:default;}
+  .option.correct{
+    border-color:var(--good);
+    background:var(--good-bg);
+  }
+  .option.correct .letter{border-color:var(--good); background:var(--good); color:#fff;}
+  .option.wrong{
+    border-color:var(--bad);
+    background:var(--bad-bg);
+  }
+  .option.wrong .letter{border-color:var(--bad); background:var(--bad); color:#fff;}
+  .option.muted{opacity:.55;}
+
+  .feedback{
+    margin-top:20px;
+    padding:16px 18px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:#f7f9fc;
+    display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback .verdict{
+    font-family:var(--ui);
+    font-weight:700;
+    font-size:13.5px;
+    margin:0 0 6px 0;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .feedback.correct .verdict{color:var(--good);}
+  .feedback.wrong .verdict{color:var(--bad);}
+  .feedback p.exp{
+    margin:0;
+    font-size:15px;
+    color:var(--ink);
+    line-height:1.55;
+  }
+  .feedback p.exp b{color:var(--navy);}
+
+  .nav-row{
+    display:flex;
+    justify-content:flex-end;
+    padding:18px 26px 26px 26px;
+  }
+  .btn{
+    font-family:var(--ui);
+    font-weight:600;
+    font-size:14.5px;
+    padding:11px 22px;
+    border-radius:7px;
+    border:none;
+    cursor:pointer;
+    background:var(--navy);
+    color:#fff;
+  }
+  .btn:hover{background:var(--navy-deep);}
+  .btn:disabled{background:#b9c3d1; cursor:not-allowed;}
+  .btn.ghost{
+    background:transparent;
+    color:var(--navy);
+    border:1px solid var(--navy);
+  }
+  .btn.ghost:hover{background:#eef3fa;}
+
+  /* ---------- Results ---------- */
+  .result{
+    padding:40px 26px;
+    text-align:center;
+  }
+  .result .big{
+    font-family:var(--sans);
+    font-size:48px;
+    font-weight:700;
+    color:var(--navy);
+    margin:0;
+  }
+  .result .big span{color:var(--ink-soft); font-size:26px;}
+  .result p{color:var(--ink-soft); font-size:15px; margin:10px 0 26px 0;}
+  .result .actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+
+  .empty{
+    padding:60px 26px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:15px;
+  }
+
+  footer{
+    max-width:980px;
+    margin:0 auto;
+    padding:0 28px 50px 28px;
+    color:#8d97a5;
+    font-size:12.5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <p class="eyebrow">PRO192 · Object-Oriented Programming with Java</p>
+    <h1>Java OOP Quiz Bank</h1>
+    <p class="sub">12 practice sets: 10 mixed-topic sets (10 questions each) plus 2 code-reading sets (25 questions each) with real Java snippets. Questions in English — explanations in Vietnamese appear right after you answer.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <p class="picker-label">Choose a set — Chọn một đề</p>
+  <div class="set-grid" id="setGrid"></div>
+
+  <div class="panel" id="panel">
+    <div class="empty">Chọn một đề ở trên để bắt đầu làm bài. →</div>
+  </div>
+</div>
+
+<footer>Code snippets are fragments (imports and the surrounding class/main are omitted); written for Java 8 and later. Generated from the PRO192 lecture slides and practice sheets. Refresh the page to reshuffle every set.</footer>
+
+<script>
+const CATEGORY_NAMES = {
+  1:  "Java Language Basics",
+  2:  "Exception Handling",
+  3:  "Encapsulation & Class Design",
+  4:  "Memory Management & GC",
+  5:  "Inheritance",
+  6:  "Polymorphism, Interfaces & Abstract Classes",
+  7:  "Numbers & Strings",
+  8:  "Collections Framework",
+  9:  "Support Classes & Practice Tasks",
+  10: "File Input/Output"
+};
+
+/* Q(category, question, correct option, [wrong options], Vietnamese explanation) */
+const Q = (cat, q, right, wrongs, exp) => ({cat, q, options:[right, ...wrongs], correct:0, exp});
+/* CQ(question, code, correct option, [wrong options], Vietnamese explanation) */
+const CQ = (q, code, right, wrongs, exp) => ({q, code, options:[right, ...wrongs], correct:0, exp});
+
+const POOL = [
+
+/* ============ CATEGORY 1: Java Language Basics (+ Array of Objects) ============ */
+Q(1, "Which statement about Java identifiers is correct?",
+  "Java is case-sensitive, and an identifier must be different from the keywords",
+  ["Java is not case-sensitive, so `Total` and `total` are the same identifier",
+   "An identifier may be a reserved keyword such as `class` if it is written in quotes",
+   "An identifier must always start with a digit"],
+  "Java là ngôn ngữ <b>phân biệt chữ hoa/thường (case-sensitive)</b>, và identifier phải <b>khác với keyword</b> (slide Keywords and Identifiers). Vì vậy `Total` và `total` là hai tên khác nhau."),
+Q(1, "How does the lecture define a primitive data type?",
+  "A simple non-object data type that represents a single value",
+  ["A class that wraps several values together",
+   "A reference to an object stored on the heap",
+   "An array that holds a fixed number of values"],
+  "Theo slide, <b>primitive</b> là kiểu dữ liệu đơn giản, <b>không phải đối tượng</b>, biểu diễn <b>một giá trị duy nhất</b> (int, double, char, boolean...)."),
+Q(1, "Which pair of literals is correct in Java?",
+  "`123L` has type long, and `1.234` has the default type double",
+  ["`123` has type long, and `1.234f` has type double",
+   "`123L` has type double, and `1.234` has type float",
+   "`0x1c` has type long, and `1.3E+21` has type float"],
+  "Số nguyên mặc định là <b>int</b> (28, 0x1c); hậu tố <b>L</b> (123L) mới cho kiểu <b>long</b>. Số thực mặc định là <b>double</b> (1.234); phải thêm hậu tố f/F (1.3f) mới là float."),
+Q(1, "Which rule about type conversion is stated in the lecture?",
+  "A narrowing conversion is not allowed implicitly, so we must use explicit casting",
+  ["A `boolean` can be converted to an `int` with a cast",
+   "Narrowing conversions are always performed automatically",
+   "Widening conversions always require an explicit cast"],
+  "Widening (ví dụ int → double) làm tự động; <b>narrowing</b> (double → int) <b>không được phép ngầm</b>, phải ép kiểu tường minh. Ngoài ra <b>boolean không thể chuyển</b> sang bất kỳ kiểu nào khác."),
+Q(1, "Which statement about a one-dimensional array in Java is correct?",
+  "It is a container object holding a fixed number of values of a single type; its length is set when it is created",
+  ["Its length grows automatically whenever a new element is added",
+   "It can hold elements of different primitive types at the same time",
+   "Its elements are accessed by name instead of by index"],
+  "Array là <b>đối tượng chứa số lượng phần tử cố định, cùng một kiểu</b>; độ dài được xác định lúc tạo (`new int[10]`) và không tự tăng. Phần tử được truy cập bằng chỉ số (bắt đầu từ 0)."),
+Q(1, "Which method is used to copy elements from one array to another, according to the slide 'Copying Arrays'?",
+  "`System.arraycopy`",
+  ["`System.copyArray`", "`System.clonearray`", "`System.println`"],
+  "Slide Copying Arrays: dùng phương thức <b>`System.arraycopy`</b> của lớp `System`."),
+Q(1, "Which class from `java.util` is used in the lecture to read values typed on the keyboard with methods such as `nextInt()`?",
+  "`Scanner`",
+  ["`StringBuilder`", "`Random`", "`Arrays`"],
+  "Slide Input/Output Data dùng <b>`java.util.Scanner`</b> cùng `System.in`, với các phương thức `next()`, `nextInt()`, `nextLine()`..."),
+Q(1, "What is a Java package, and where must the `package` statement appear?",
+  "A namespace that organizes related classes and interfaces; it must be the first line of the Java code",
+  ["A compiled file that contains only the `main` method; it can appear anywhere",
+   "A special class that cannot contain interfaces; it must follow the imports",
+   "A collection of variables; it must be inside the `main` method"],
+  "<b>Package</b> là không gian tên (namespace) tổ chức các class và interface liên quan. Nếu có dùng package thì câu lệnh `package` phải nằm ở <b>dòng đầu tiên</b> của mã Java."),
+Q(1, "After executing `Item[] list = new Item[100];` what is stored in each element of `list`?",
+  "`null` — no Item object has been created yet",
+  ["A default Item object created by the default constructor", "The number 0", "An empty string"],
+  "Mảng đối tượng chỉ tạo ra các <b>tham chiếu</b>, mỗi phần tử mặc định là <b>null</b>. Phải dùng `new Vase()`, `new Statue()`... cho từng phần tử, như `addItem` trong case study ItemList."),
+Q(1, "In the ItemList case study, what does `removeItem(int index)` do with the elements located after the removed position?",
+  "It shifts them one position to the left and decreases `numOfItem`",
+  ["It leaves a `null` hole and keeps `numOfItem` unchanged",
+   "It moves them to the end of the array",
+   "It deletes the whole array"],
+  "Phương thức <b>dịch các phần tử phía sau sang trái</b> (`list[j] = list[j+1]`) rồi giảm `numOfItem--`, để mảng không còn khoảng trống."),
+
+/* ============ CATEGORY 2: Exception Handling ============ */
+Q(2, "According to the lecture, which class do all exceptions descend from?",
+  "`java.lang.Throwable`",
+  ["`java.lang.Error`", "`java.io.IOException`", "`java.lang.RuntimeException`"],
+  "Mọi exception đều kế thừa từ <b>`java.lang.Throwable`</b>; Throwable có hai nhánh là `Error` và `Exception`."),
+Q(2, "What must a programmer do with a checked exception?",
+  "Handle it with try-catch, or declare it with `throws`",
+  ["Nothing — the compiler ignores it", "Convert it into an `Error`", "Catch it only inside the `main` method"],
+  "<b>Checked exception</b> bắt buộc phải xử lý bằng cơ chế <b>try-catch</b> hoặc khai báo <b>throws</b>, nếu không compiler sẽ báo lỗi."),
+Q(2, "Which of the following are unchecked exceptions (program bugs that need not be caught)?",
+  "`RuntimeException` and its subclasses",
+  ["`IOException`", "`FileNotFoundException`", "Every class that extends `Exception` directly"],
+  "Theo sơ đồ phân cấp: `Error` và <b>`RuntimeException`</b> (cùng các lớp con) là <b>unchecked</b>. Các lớp con trực tiếp của Exception như IOException là checked."),
+Q(2, "When is the code inside a `finally` block executed?",
+  "Always — whether or not an exception is thrown or caught in the try/catch code",
+  ["Only when an exception is thrown", "Only when no exception is thrown", "Only when no catch block handles the exception"],
+  "Khối <b>finally</b> được <b>đảm bảo thực thi</b> trong mọi trường hợp: try chạy xong bình thường, exception bị catch xử lý, hoặc exception không bị catch nào xử lý."),
+Q(2, "A `try` block has several `catch` blocks and an exception is thrown. Which handler runs?",
+  "The first matching catch block runs and the others are skipped",
+  ["All matching catch blocks run in order", "The last matching catch block runs", "None of them; only `finally` runs"],
+  "Khi có exception, <b>catch block đầu tiên khớp</b> sẽ được thực thi, các catch còn lại bị bỏ qua. Vì vậy phải đặt catch cụ thể trước catch tổng quát."),
+Q(2, "How should you declare your own checked exception class?",
+  "It should extend `java.lang.Exception` (or one of its subclasses)",
+  ["It should extend `java.lang.RuntimeException`", "It should extend `java.lang.Error`", "It should implement the interface `Throwable`"],
+  "Checked exception tự định nghĩa phải <b>extends Exception</b>; còn runtime exception thì extends <b>RuntimeException</b> (ví dụ `class InvalidAge extends Exception`)."),
+Q(2, "Which keyword is used in a method header to declare that the method may pass an exception to its caller, e.g. `void MyMethod(int a) ___ InvalidAge`?",
+  "`throws`",
+  ["`throw`", "`finally`", "`assert`"],
+  "<b>`throws`</b> được khai báo ở chữ ký phương thức; còn <b>`throw new InvalidAge(...)`</b> là câu lệnh thực sự ném ngoại lệ trong thân phương thức."),
+Q(2, "When you override a method, which rule applies to the exceptions that the new method may throw?",
+  "They must be the same as, or subclasses of, the exceptions thrown by the original method",
+  ["It may throw any new checked exception", "It may never declare any exception", "It must always throw `Throwable`"],
+  "Slide Exceptions and Overriding: compiler yêu cầu mọi exception mà phương thức override ném ra phải <b>giống hoặc là lớp con</b> của exception mà phương thức gốc ném ra."),
+Q(2, "What are the two forms of an assertion statement mentioned in the lecture?",
+  "`assert expression;` and `assert expression1 : expression2;`",
+  ["`assert(expression)` and `assertAll(expression)`", "`assert expression;` and `assume expression;`", "`assert if expression;` and `assert else expression;`"],
+  "Hai dạng: `assert expression;` (điều kiện đúng/sai) và `assert expression1 : expression2;` (kèm thông điệp lỗi). Cần bật tùy chọn khi biên dịch/chạy chương trình."),
+Q(2, "Why is a stack trace useful when an exception occurs deep in a call chain such as A() → B() → C() → D()?",
+  "It lists the running methods on the program stack, so we can trace the statements related to the exception",
+  ["It automatically repairs the faulty statement", "It prevents the exception from propagating", "It deletes the failed methods from memory"],
+  "Khi exception xảy ra, <b>program stack</b> đang chứa các phương thức đang chạy (A gọi B, B gọi C...). Stack trace cho phép <b>lần theo</b> các câu lệnh liên quan đến lỗi."),
+
+/* ============ CATEGORY 3: Encapsulation & Class Design ============ */
+Q(3, "Which description best fits encapsulation?",
+  "Aggregating data and behavior in a class, hiding the data from outside and accessing it only through methods",
+  ["Creating a new class from an existing class", "Giving one method name several versions", "Converting a primitive value into an object"],
+  "<b>Encapsulation (đóng gói)</b>: Class = dữ liệu + phương thức; dữ liệu nên được <b>ẩn</b> khỏi bên ngoài và chỉ truy cập qua các phương thức (getter/setter)."),
+Q(3, "When identifying classes from a problem description, which mapping does the lecture recommend?",
+  "Main noun → class; auxiliary nouns → fields; verbs → methods",
+  ["Main noun → method; verbs → fields", "Adjectives → classes; nouns → methods", "Verbs → classes; nouns → constructors"],
+  "Danh từ chính → <b>Class</b>; danh từ bổ nghĩa → <b>fields/properties</b>; động từ liên quan → <b>methods</b> (ví dụ Student có code, name, bYear, address và input(), output())."),
+Q(3, "Which statement about a constructor is correct?",
+  "It has the same name as the class and has no return type",
+  ["It can have any name but must return `void`", "It must always be declared `static`", "A class can have only one constructor"],
+  "Constructor khai báo giống method nhưng <b>dùng tên của class và không có kiểu trả về</b>; một class có thể có nhiều constructor (overloading)."),
+Q(3, "A class `Point` declares only the constructor `Point(int x, int y)`. What happens when the code calls `new Point()`?",
+  "Compile error — the compiler does not insert a default constructor once you write your own constructor",
+  ["It works; the compiler always inserts a default constructor", "It works and sets x and y to 0", "A runtime exception occurs"],
+  "Demo 2 trong slide: nếu bạn tự viết constructor thì <b>compiler không chèn constructor mặc định</b> nữa, nên `new Point()` gây lỗi biên dịch."),
+Q(3, "What does the keyword `this` represent inside an instance method or constructor?",
+  "The address (reference) of the current object",
+  ["The superclass of the current class", "The class declaration stored in the static heap", "A brand-new copy of the object"],
+  "`this` chứa <b>địa chỉ của đối tượng hiện tại</b>. Nó giúp phân biệt tên field và tham số trùng tên, ví dụ `this.name = name;`."),
+Q(3, "Why does a setter often contain an `if` statement, such as `if(!name.isEmpty()) this.name = name;`?",
+  "To check the parameter so that the data of the object are always valid",
+  ["To make the setter static", "To make the program run faster", "To hide the field from the compiler"],
+  "Phương thức nên có <b>điều kiện biên</b>: kiểm tra tham số bằng `if` để dữ liệu của đối tượng luôn hợp lệ — đây là lợi ích của setter trong encapsulation."),
+Q(3, "Which is the correct order of access levels, from the most accessible to the least accessible?",
+  "public > protected > default (no specifier) > private",
+  ["private > default > protected > public", "protected > public > default > private", "public > default > protected > private"],
+  "Thứ tự theo slide: <b>public > protected > default > private</b>. Private chỉ truy cập được bên trong chính class đó."),
+Q(3, "Java passes arguments by value. What happens when the argument is an object reference?",
+  "A copy of the reference value is passed, so the method can modify the object it refers to but cannot change the caller's variable",
+  ["A complete copy of the object is made", "The caller's variable itself is passed, so it can be reassigned inside the method", "Nothing is passed"],
+  "Java luôn <b>truyền theo giá trị</b>. Với tham chiếu đối tượng, <b>giá trị của tham chiếu được sao chép</b>: method sửa được đối tượng được trỏ tới nhưng không thể làm biến của nơi gọi trỏ sang đối tượng khác."),
+Q(3, "What are the three parts of the statement `Student stu = new Student(\"SE123\", \"Minh\", 2000, \"1 Ba Trieu\");`?",
+  "Declaration, instantiation and initialization",
+  ["Compilation, linking and execution", "Inheritance, polymorphism and abstraction", "Encapsulation, overriding and overloading"],
+  "Slide Creating Objects: <b>Declaration</b> (khai báo biến), <b>Instantiation</b> (toán tử `new` cấp phát bộ nhớ), <b>Initialization</b> (gọi constructor để gán giá trị cho các field)."),
+Q(3, "Which combination describes a good class design according to the lecture?",
+  "Low coupling and high cohesion",
+  ["High coupling and low cohesion", "High coupling and high cohesion", "Low coupling and low cohesion"],
+  "<b>Low coupling</b> (ít phụ thuộc vào chi tiết bên trong class khác) và <b>high cohesion</b> (mỗi phương thức làm một việc, khó tách nhỏ hơn) là thiết kế tốt."),
+
+/* ============ CATEGORY 4: Memory Management & Garbage Collection ============ */
+Q(4, "According to the lecture, how is the Java heap managed?",
+  "By two lists: a free block list and an allocated block list",
+  ["By one array of objects", "By the programmer using `malloc` and `free`", "By the operating system only"],
+  "Heap của Java được quản lý bằng <b>hai danh sách</b>: <b>Free block list</b> và <b>Allocated block list</b>; ban đầu free block list là toàn bộ heap."),
+Q(4, "Which allocation strategy does Java use for the heap, and what happens when no free block fits?",
+  "First fit; the memory manager compacts memory to create a larger free block",
+  ["Best fit; the program stops with an error", "Random fit; the object is placed on the stack", "Last fit; the oldest object is deleted"],
+  "Cách cấp phát là <b>First fit</b>. Nếu không có khối trống nào đủ lớn, bộ quản lý bộ nhớ phải <b>compact (dồn) bộ nhớ</b> để tạo khối trống lớn hơn."),
+Q(4, "According to the lecture, what does the static heap contain, and is garbage collection needed there?",
+  "Class declarations; they are invariable, so garbage collection is not needed",
+  ["Objects created with `new`; garbage collection is applied", "Local variables; they are removed when the method exits", "The relations between objects and methods"],
+  "<b>Static heap</b> chứa khai báo class (hằng/field, method table, mã phương thức) — <b>không thay đổi</b> nên không cần garbage collection."),
+Q(4, "According to the lecture, what are the two sections of the dynamic heap?",
+  "Section 1 holds the objects (garbage collection is applied); section 2 holds the relations between objects and methods",
+  ["Section 1 holds classes; section 2 holds threads", "Section 1 holds local variables; section 2 holds constants", "Section 1 holds code; section 2 holds static fields"],
+  "<b>Dynamic heap</b> chia hai phần: phần 1 chứa <b>các đối tượng</b> (áp dụng GC), phần 2 chứa <b>quan hệ giữa đối tượng và phương thức</b> tương ứng trong static heap."),
+Q(4, "Where are the local variables and parameters of a method allocated, and when are they discarded?",
+  "On the stack; they are discarded when the method exits",
+  ["On the heap; they are discarded by the garbage collector", "In the static heap; they live until the program ends", "In the data segment; they are never discarded"],
+  "Dữ liệu cục bộ của phương thức nằm trên <b>stack</b> và bị hủy khi phương thức kết thúc; còn đối tượng nằm trên <b>heap</b> và sống lâu hơn."),
+Q(4, "Which statement about freeing memory in Java is correct?",
+  "The programmer never explicitly frees memory; Java provides automatic garbage collection",
+  ["The programmer must call `free()` for every object", "The programmer must call `delete` after every `new`", "Memory is freed only when the computer restarts"],
+  "Trong Java bạn <b>không bao giờ giải phóng bộ nhớ tường minh</b>; JVM có <b>garbage collector tự động</b> theo dõi vùng nhớ đã cấp phát và xác định còn dùng được hay không."),
+Q(4, "According to the lecture, when does the garbage collector run?",
+  "It has the lowest priority and runs only when the program's memory is exhausted",
+  ["Immediately after every object is created", "Every second", "Only when the programmer calls it"],
+  "Theo slide: GC có <b>độ ưu tiên thấp nhất</b>, nên chỉ chạy khi <b>bộ nhớ của chương trình cạn kiệt</b>."),
+Q(4, "According to the lecture, who activates the garbage collector?",
+  "Only the JVM — we cannot activate it",
+  ["The programmer, through a special constructor", "The compiler, at compile time", "The operating system, at boot time"],
+  "Slide: GC <b>chỉ do JVM gọi</b>, lập trình viên không thể kích hoạt nó."),
+Q(4, "When is data treated as garbage in Java, according to the lecture?",
+  "When it is out of its scope, or when an object reference is assigned `null` so the memory is no longer used",
+  ["When it is declared `final`", "When it is passed to a method", "When it is created with `new`"],
+  "Dữ liệu bị coi là rác khi <b>ra khỏi phạm vi (scope)</b> — biến có phạm vi từ dòng khai báo đến dấu `}` của khối chứa nó — hoặc khi đối tượng bị gán <b>null</b> (không còn được dùng)."),
+Q(4, "In C there are 4 basic memory regions. Which list is correct, and who must manage the heap?",
+  "Data segment, code segment, stack, heap; C/C++ programmers must manage the heap explicitly",
+  ["Registers, cache, RAM, disk; the compiler manages the heap", "Static heap, dynamic heap, stack, queue; the JVM manages the heap", "Code segment, library, kernel, heap; the OS manages the heap"],
+  "Phần Review trong slide: C có 4 vùng <b>data segment</b> (dữ liệu toàn cục), <b>code segment</b>, <b>stack</b>, <b>heap</b>; lập trình viên C/C++ phải tự quản lý heap, còn Java giao việc này cho garbage collector."),
+
+/* ============ CATEGORY 5: Inheritance ============ */
+Q(5, "Which keyword is used to create a subclass in Java?",
+  "`extends`",
+  ["`implements`", "`inherits`", "`super`"],
+  "Từ khóa <b>`extends`</b> dùng để tạo lớp con; `implements` dùng cho interface."),
+Q(5, "Java is a single-inheritance language. What does this mean?",
+  "A class can be directly derived from only one class",
+  ["A class can have only one method", "A class can have only one object", "A class can implement only one interface"],
+  "<b>Single-inheritance</b>: một class chỉ được kế thừa trực tiếp từ <b>một</b> class. (Muốn gần giống đa kế thừa thì dùng nhiều interface.)"),
+Q(5, "If a class does not declare any superclass, which class does it implicitly extend?",
+  "`java.lang.Object`",
+  ["`java.lang.Class`", "`java.lang.Number`", "None; it has no superclass"],
+  "Nếu không có superclass, class <b>ngầm kế thừa từ `Object`</b> — nên mọi class đều có `toString()`, `equals()`..."),
+Q(5, "Which statement about constructors and inheritance is correct?",
+  "Constructors are not inherited; a subclass reuses a superclass constructor by calling `super(...)`",
+  ["Constructors are inherited, so a subclass can call them by name", "Only default constructors are inherited", "Constructors are inherited only if the class is public"],
+  "<b>Constructor không được kế thừa</b> (constructor của lớp cha không thể khởi tạo đối tượng lớp con); muốn tái sử dụng phải gọi <b>`super(arguments)`</b>."),
+Q(5, "Where must the call `super(arguments);` appear in a subclass constructor?",
+  "As the first statement",
+  ["As the last statement", "Anywhere in the constructor", "Only inside a static block"],
+  "Lời gọi `super(...)` <b>phải là câu lệnh đầu tiên</b> trong constructor của lớp con (slide có gợi ý thử đổi chỗ để thấy lỗi)."),
+Q(5, "How are the relations 'is a' and 'has a' implemented?",
+  "'is a' as a subclass (inheritance); 'has a' as a reference (field) to another object",
+  ["'is a' as a reference; 'has a' as a subclass", "Both as subclasses", "Both as static methods"],
+  "Quan hệ <b>is a</b> được cài đặt bằng <b>lớp con</b> (Student is a Person). Quan hệ <b>has a</b> được cài đặt bằng <b>tham chiếu</b> (class Professor has field `Student[] students`)."),
+Q(5, "What is the difference between overriding and hiding a method?",
+  "Overriding re-implements an instance method with the same signature and return type; hiding re-implements a static method of the superclass",
+  ["Overriding is for static methods; hiding is for instance methods", "They are the same thing", "Overriding changes the parameter types; hiding changes the method name"],
+  "<b>Overriding</b>: method thể hiện ở lớp con có cùng signature và kiểu trả về. <b>Hiding</b>: cài đặt lại phương thức <b>static</b> của lớp cha."),
+Q(5, "What does the `instanceof` operator return?",
+  "`true` or `false`, telling whether the object's reference belongs to the given type",
+  ["The class name of the object as a String", "The memory address of the object", "The number of objects of that class"],
+  "<b>`instanceof`</b> kiểm tra tham chiếu của một đối tượng có thuộc kiểu cho trước hay không và trả về <b>true/false</b>; nên kiểm tra trước khi ép kiểu."),
+Q(5, "Given `Rectangle obj = new Box();` where `Box` extends `Rectangle` and declares `setHeight(int)`, how can you call `setHeight` through `obj`?",
+  "`((Box) obj).setHeight(300);` — cast explicitly",
+  ["`obj.setHeight(300);` — it works automatically", "`Box.setHeight(300);`", "`super.setHeight(300);`"],
+  "Biến kiểu lớp cha chỉ gọi được phương thức của lớp cha; để gọi phương thức của lớp con phải <b>ép kiểu tường minh</b>: `((Box) obj).setHeight(300);`."),
+Q(5, "In what order are constructors executed in an inheritance hierarchy?",
+  "From the superclass to the derived class",
+  ["From the derived class to the superclass", "In random order", "Only the derived class constructor is executed"],
+  "Slide Summary: constructor chạy theo thứ tự <b>từ lớp cha đến lớp dẫn xuất (lớp con)</b>."),
+
+/* ============ CATEGORY 6: Polymorphism, Interfaces & Abstract Classes ============ */
+Q(6, "How does the lecture describe polymorphism?",
+  "The ability of an object to take on many forms, implemented through overloading and overriding",
+  ["The ability to hide data inside a class", "The ability to create objects without constructors", "The ability to run several programs at the same time"],
+  "<b>Polymorphism (đa hình)</b> là khả năng một đối tượng có nhiều dạng, được hiện thực bằng <b>overloading</b> và <b>overriding</b>; xảy ra khi tham chiếu lớp cha/interface trỏ tới đối tượng lớp con."),
+Q(6, "Which pair of methods is an example of overloading?",
+  "`void setValue(int len)` and `void setValue(int len, int wi)` in the same class",
+  ["`String toString()` in `Rectangle` and `String toString()` in its subclass `Box`", "`int area()` declared twice with exactly the same parameters in one class", "`Rectangle()` and `Box()` constructors in two unrelated classes"],
+  "<b>Overloading</b>: cùng tên phương thức, <b>khác tham số</b>, trong cùng một class. Cặp `toString()` ở lớp cha và lớp con là ví dụ của <b>overriding</b>."),
+Q(6, "Which statement about overriding is correct?",
+  "A method of the parent class is re-written (its body replaced) in a derived class",
+  ["Methods in the same class have the same name but different parameters", "A constructor of the parent class is replaced in the subclass", "A private field is redeclared as static"],
+  "<b>Overriding</b>: phương thức của lớp cha có thể được viết lại (thay thân phương thức) trong các lớp dẫn xuất. Bản đã override quyết định bởi kiểu thực sự của đối tượng lúc chạy."),
+Q(6, "What can an interface contain according to the lecture, and can it be instantiated?",
+  "Constants, abstract/default/static methods and nested types; it cannot be instantiated",
+  ["Only private fields and constructors; it can be instantiated", "Only concrete methods; it can be instantiated with `new`", "Only static fields; it can be instantiated through a subclass"],
+  "<b>Interface</b> là kiểu tham chiếu chỉ chứa hằng, trường đã khởi tạo, phương thức static, prototype (abstract/default) và nested types. Nó <b>không thể tạo đối tượng</b> vì phương thức không có thân."),
+Q(6, "How can Java achieve something similar to multiple inheritance?",
+  "A class can implement multiple interfaces",
+  ["A class can extend several classes separated by commas", "By using the `multiple` keyword", "By declaring several `main` methods"],
+  "Java không hỗ trợ đa kế thừa lớp, nhưng <b>một class có thể implements nhiều interface</b> để đạt hiệu quả tương tự."),
+Q(6, "What is true for a field declared in an interface, such as `int n = 0;`?",
+  "It must be initialized (it is effectively a constant)",
+  ["It can be left uninitialized", "It is private by default", "Implementing classes may change its value freely"],
+  "Slide: <b>fields trong interface phải được khởi tạo</b> (thực chất là hằng public static final)."),
+Q(6, "A class `A implements InterfaceDemo` writes `void m3() { ... }` (no modifier) to implement `void m3();` from the interface. What happens?",
+  "Compile error — it assigns weaker access privileges; the method must be `public`",
+  ["It compiles and works normally", "It compiles with a warning only", "A runtime exception occurs when m3() is called"],
+  "Các phương thức của interface mặc định là public nên khi cài đặt trong class cụ thể <b>phải khai báo `public`</b>; nếu không sẽ bị lỗi 'attempting to assign weaker access privileges'."),
+Q(6, "Which statement about abstract classes is correct?",
+  "An abstract class cannot be instantiated, but it may also declare implemented (concrete) methods",
+  ["All methods of an abstract class must be abstract", "An abstract class must not have subclasses", "An abstract class can be instantiated with `new` if it has a constructor"],
+  "<b>Abstract class</b> không thể tạo đối tượng, nhưng không bắt buộc mọi phương thức phải abstract — nó có thể khai báo cả phương thức đã cài đặt."),
+Q(6, "`Derived extends AbstractDemo2`, and `AbstractDemo2` declares `abstract void m2();`. `Derived` does not override `m2()`. What is the result?",
+  "Compile error — `Derived` must implement `m2()` or be declared abstract",
+  ["It compiles because m2 is optional", "It compiles, but a runtime error occurs when m2 is called", "It compiles and m2 automatically gets an empty body"],
+  "Lớp con của abstract class <b>thừa hưởng cả các phương thức abstract</b>; muốn dùng được phải override (cài đặt) chúng, nếu không lớp con cũng phải khai báo abstract."),
+Q(6, "What is an anonymous class?",
+  "A class without a name that is declared and instantiated at the same time; the compiler names it like `ContainerClass$Number`",
+  ["A class whose fields are all private", "A class that can only be used by the JVM", "A class that contains no methods"],
+  "<b>Anonymous class</b> không có tên, <b>khai báo và tạo đối tượng cùng lúc</b>, giúp mã ngắn gọn; compiler tự đặt tên dạng `Anonymous1$1.class`."),
+
+/* ============ CATEGORY 7: Numbers & Strings ============ */
+Q(7, "What is the relationship among numeric wrapper classes such as `Integer` and `Double`?",
+  "They are subclasses of the abstract class `Number`",
+  ["They are subclasses of `String`", "They are interfaces", "They are subclasses of `Math`"],
+  "Tất cả các wrapper class số đều là <b>lớp con của lớp abstract `Number`</b>."),
+Q(7, "`public final class Integer extends Number implements Comparable&lt;Integer&gt;` — what does `final` imply?",
+  "We cannot create a subclass of `Integer`",
+  ["We cannot create objects of `Integer`", "`Integer` objects cannot be compared", "`Integer` cannot be used as a method argument"],
+  "Do `Integer` khai báo <b>final</b> nên <b>không thể tạo lớp con</b> của wrapper class."),
+Q(7, "Why are wrapper class objects described as immutable?",
+  "They have no setters, so their value cannot be changed after creation",
+  ["They are stored in the static heap", "They can only be created with the default constructor", "They are declared `static`"],
+  "Wrapper class <b>bất biến (immutable)</b> vì không có setter — giá trị không thể thay đổi sau khi đối tượng được tạo."),
+Q(7, "What are autoboxing and unboxing?",
+  "Autoboxing converts a primitive value into a wrapper object; unboxing converts a wrapper object back to its primitive value",
+  ["Autoboxing converts a String to an int; unboxing does the reverse", "Autoboxing is the `new` keyword; unboxing is garbage collection", "Autoboxing stores objects in arrays; unboxing removes them"],
+  "Ví dụ: `Integer wrappedInt = 25;` là <b>autoboxing</b>; `int times9 = wi * 9;` (với `Integer wi`) là <b>unboxing</b>. Hai tính năng này có từ Java 5.0."),
+Q(7, "Which `Math` method returns a pseudo-random number between 0.0 and 1.0?",
+  "`Math.random()`",
+  ["`Math.rand()`", "`Math.next()`", "`Math.floor()`"],
+  "Phương thức <b>`Math.random()`</b> trả về số giả ngẫu nhiên nằm giữa 0.0 và 1.0."),
+Q(7, "Which statement about `char` and the `Character` class is correct?",
+  "A `char` is a 2-byte Unicode character, and `Character` offers static methods such as `isLetter` and `toUpperCase`",
+  ["A `char` is a 1-byte ASCII character", "`Character` has no useful methods", "`isDigit` can only be called on a `Character` object, never statically"],
+  "Ký tự trong Java là <b>Unicode 2 byte</b>; lớp `Character` cung cấp các phương thức static như `isLetter(char)`, `isDigit(char)`, `isUpperCase(char)`, `toUpperCase(char)`."),
+Q(7, "Which statement about `String` is correct?",
+  "A `String` is immutable: methods such as `toUpperCase()` return a new string and do not change the original",
+  ["A `String` is mutable and `toUpperCase()` changes it in place", "A `String` has setters for each character", "A `String` is a primitive type"],
+  "<b>String bất biến</b>: sau khi tạo, nội dung không đổi; hầu hết phương thức (`toUpperCase`, `replace`, `substring`...) <b>trả về chuỗi mới</b>."),
+Q(7, "What is the proper way to compare the content of two strings?",
+  "`st1.equals(st2)`",
+  ["`st1 == st2`", "`st1 = st2`", "`st1.compare(st2)`"],
+  "Nên dùng <b>`equals()`</b> để so sánh nội dung (deep comparing). Toán tử `==` chỉ so sánh tham chiếu (shallow comparing) — do String pool nên kết quả có thể gây nhầm lẫn."),
+Q(7, "What is the main difference between `StringBuffer` and `StringBuilder`?",
+  "`StringBuffer` is thread-safe; `StringBuilder` is not thread-safe but generally faster",
+  ["`StringBuilder` is immutable", "`StringBuffer` was introduced in 5.0 and is not thread-safe", "They are exactly the same in every respect"],
+  "Hai lớp gần giống nhau, khác biệt chính: <b>StringBuffer thread-safe</b> (các phương thức synchronized); <b>StringBuilder (từ Java 5.0) không thread-safe</b> nhưng thường chạy nhanh hơn khi chỉ một luồng dùng."),
+Q(7, "Which `String` method splits a string into an array of substrings using a regular expression as the delimiter?",
+  "`split(String regex)`",
+  ["`divide(String regex)`", "`tokenize()`", "`substring(String regex)`"],
+  "<b>`split(String regex)`</b> của lớp String (hoặc `StringTokenizer`) dùng để tách chuỗi thành các chuỗi con theo ký tự phân cách."),
+
+/* ============ CATEGORY 8: Collections Framework ============ */
+Q(8, "Which statement about a `List` is correct?",
+  "It keeps elements in the order they were added, allows duplicates, and each element has an index starting from 0",
+  ["It does not allow duplicate elements", "It stores pairs of key and value", "It automatically sorts its elements"],
+  "<b>List</b> giữ nguyên thứ tự thêm vào, <b>cho phép trùng lặp</b>, mỗi phần tử có chỉ số bắt đầu từ 0 (add(int, Object), get(int), indexOf, remove(int))."),
+Q(8, "Which type of collection does NOT allow duplicate elements?",
+  "`Set`",
+  ["`List`", "`ArrayList`", "`Vector`"],
+  "<b>Set</b> chỉ chứa các phần tử phân biệt (không trùng); List (ArrayList, Vector) cho phép trùng lặp."),
+Q(8, "What does a `Map` store, and how does it handle keys?",
+  "Pairs of key and value; each key is unique and checked with `equals()`",
+  ["Single values only; duplicates are allowed", "Only indexes of elements", "Only sorted values"],
+  "<b>Map</b> lưu cặp <b>&lt;key, value&gt;</b>, mỗi key chỉ ứng với một value và được kiểm tra duy nhất bằng `equals()`. Map <b>không implements</b> interface Collection."),
+Q(8, "What is the difference between `ArrayList` and `Vector`?",
+  "`Vector` is like `ArrayList` but it is synchronized",
+  ["`Vector` is a Set while `ArrayList` is a List", "`ArrayList` is synchronized but `Vector` is not", "`ArrayList` cannot store objects"],
+  "<b>Vector</b> giống ArrayList nhưng <b>synchronized</b>. Slide ghi chú Vector đã cũ từ Java 1.6 nhưng vẫn được giới thiệu vì là tham số của constructor `JTable`."),
+Q(8, "Which class can be used as a stack, a queue or a double-ended queue (deque)?",
+  "`LinkedList`",
+  ["`TreeSet`", "`HashMap`", "`Arrays`"],
+  "<b>LinkedList</b> (cài đặt List) có thể dùng như stack, queue hoặc deque."),
+Q(8, "What is an `Iterator` used for?",
+  "Traversing the elements of a collection using `hasNext()` and `next()`",
+  ["Sorting the elements of a collection", "Creating a new collection", "Closing a file"],
+  "<b>Iterator</b> là cách truy cập lần lượt từng phần tử của một collection bằng `hasNext()` (còn phần tử không?) và `next()` (lấy phần tử kế tiếp)."),
+Q(8, "Which comparison between `HashSet` and `TreeSet` is correct?",
+  "`HashSet` gives constant-time basic operations with no guaranteed order; `TreeSet` keeps ascending order with log(n) cost",
+  ["`HashSet` keeps elements sorted, while `TreeSet` is faster", "Both always keep elements sorted", "Both always keep insertion order"],
+  "<b>HashSet</b>: thao tác cơ bản hằng số, không đảm bảo thứ tự. <b>TreeSet</b>: duy trì thứ tự tăng dần, chi phí log(n). Cần thứ tự duyệt thì dùng TreeSet."),
+Q(8, "What must the elements of a `TreeSet` of your own class `Student` implement?",
+  "The `Comparable` interface, with the method `compareTo(Object)`",
+  ["The `Serializable` interface", "The `Cloneable` interface", "Nothing special"],
+  "TreeSet cần thứ tự giữa các phần tử nên lớp phần tử phải <b>implements `Comparable`</b> và cài đặt `compareTo(Object)` (ví dụ so sánh theo `rollNo`)."),
+Q(8, "According to the lecture, how does a `Set` check for duplicate elements?",
+  "It uses the `equals()` method, not the `==` operator",
+  ["It uses the `==` operator", "It compares the `toString()` of the elements only", "It compares the memory size of the elements"],
+  "Slide: Set dùng <b>`equals()`</b>, không dùng `==`, để kiểm tra trùng. Ví dụ hai `Point(10, 20)` bằng nhau → `set.size()` là 1 (khi lớp có định nghĩa equals phù hợp)."),
+Q(8, "What is the difference between the keys of a `HashMap` and a `TreeMap`?",
+  "`HashMap` keys have an unpredictable order; `TreeMap` keys are in natural order and must implement `Comparable`",
+  ["`HashMap` keys are always sorted; `TreeMap` keys are unordered", "Neither of them can have keys", "`TreeMap` accepts only String keys"],
+  "<b>HashMap</b> dùng bảng băm nên thứ tự key không dự đoán được; <b>TreeMap</b> lưu bằng cây nên key theo thứ tự tự nhiên và phải implements Comparable."),
+
+/* ============ CATEGORY 9: Support Classes & Practice Tasks ============ */
+Q(9, "What do the support classes `Collections` and `Arrays` have in common?",
+  "They contain static methods whose first argument is the collection/array to operate on",
+  ["They must be instantiated with `new` before use", "They are interfaces", "They work only on `String` data"],
+  "Cả hai là <b>lớp hỗ trợ</b> chứa các <b>phương thức static</b>, với tham số đầu tiên là collection (hoặc mảng) cần thao tác."),
+Q(9, "What happens if a `null` collection is passed to a method of the `Collections` class?",
+  "A `NullPointerException` is thrown",
+  ["An empty list is returned", "A compile error occurs", "Nothing happens"],
+  "Slide: các phương thức của Collections (và Arrays) <b>ném `NullPointerException`</b> nếu collection hoặc đối tượng truyền vào là null."),
+Q(9, "Which call sorts a `List` in descending order?",
+  "`Collections.sort(list, Collections.reverseOrder());`",
+  ["`Collections.sort(list);`", "`Arrays.sort(list);`", "`Collections.shuffle(list);`"],
+  "`Collections.sort(list)` sắp xếp <b>tăng dần</b> theo thứ tự tự nhiên; thêm `Collections.reverseOrder()` để sắp <b>giảm dần</b> (như phương thức `sortByName` với `orderType`)."),
+Q(9, "What is the difference between `Comparable` and `Comparator`?",
+  "`Comparable` defines the natural ordering inside the class with `compareTo`; a `Comparator` is a separate comparison function (`compare(o1, o2)`) for custom criteria",
+  ["`Comparator` is implemented inside the class; `Comparable` is always external", "They are exactly the same interface", "`Comparable` works only for Strings"],
+  "<b>Comparable</b>: class tự định nghĩa thứ tự mặc định bằng `compareTo`. <b>Comparator</b>: đối tượng so sánh riêng (thường là anonymous class) dùng `compare(o1, o2)` để sắp theo tiêu chí tùy ý, ví dụ lương giảm dần rồi ID tăng dần."),
+Q(9, "What condition is required before using `Collections.binarySearch`, and what does a negative result mean?",
+  "The list must be in ascending order; a position below 0 means the element is absent",
+  ["The list must be unsorted; a negative result means the element is present", "The list must contain only Strings; a negative result means a duplicate", "There is no condition; a negative result means an error"],
+  "binarySearch yêu cầu <b>danh sách đã sắp tăng dần</b>. Kết quả <b>pos &gt;= 0</b> → có (Present); <b>pos &lt; 0</b> → không có (Absent)."),
+Q(9, "What does `Collections.frequency(c, x)` return?",
+  "The number of times `x` occurs in the collection `c`",
+  ["The index of the first occurrence of `x`", "`true` if `x` occurs at least once", "The sum of all elements equal to `x`"],
+  "<b>frequency</b> đếm số lần phần tử xác định xuất hiện trong collection (thuộc nhóm Composition)."),
+Q(9, "What does `Collections.disjoint(c1, c2)` determine?",
+  "Whether the two collections have no elements in common",
+  ["Whether the two collections are equal", "It merges the two collections", "It sorts both collections"],
+  "<b>disjoint</b> xác định hai collection có <b>rời nhau</b> (không có phần tử chung) hay không."),
+Q(9, "Which method is NOT one of the five routine data manipulation algorithms of `Collections` listed in the lecture (reverse, fill, copy, swap, addAll)?",
+  "`frequency`",
+  ["`swap`", "`fill`", "`reverse`"],
+  "Năm thuật toán Routine Data Manipulation: <b>reverse, fill, copy, swap, addAll</b>. `frequency` thuộc nhóm <b>Composition</b> cùng với `disjoint`."),
+Q(9, "How does the `Arrays` class differ from the `Collections` class?",
+  "`Arrays` accepts arrays as parameters (e.g. `Arrays.sort`, `Arrays.binarySearch`), whereas `Collections` works on collections",
+  ["`Arrays` works only on `List` objects", "`Arrays` can be used only with Strings", "There is no difference between them"],
+  "<b>Arrays</b> tương tự Collections nhưng <b>nhận mảng làm tham số</b> (sắp xếp, tìm kiếm, `equals`, `copyOf`, `toString`...); các phương thức cũng ném NullPointerException nếu mảng là null."),
+Q(9, "In the Product practice task, `value()` = price × quantity, `vat()` = 8% of the value, and `promotion()` = 15% of the value when the product has a promotion. For price 200, quantity 5 and a promotion, what are value, vat and promotion?",
+  "1000, 80, 150",
+  ["1000, 150, 80", "1000, 8, 15", "200, 16, 30"],
+  "value = 200 × 5 = <b>1000</b>; vat = 8% × 1000 = <b>80</b>; promotion = 15% × 1000 = <b>150</b>."),
+
+/* ============ CATEGORY 10: File Input/Output ============ */
+Q(10, "What is a stream in Java I/O?",
+  "An object managing a data source whose data are read or written unit by unit (byte, character or object)",
+  ["A special kind of array", "A special kind of thread", "A primitive data type"],
+  "<b>Stream</b> là đối tượng quản lý một nguồn dữ liệu; các thao tác đọc/ghi coi dữ liệu là chuỗi đơn vị (byte/ký tự/đối tượng) và xử lý lần lượt từng đơn vị."),
+Q(10, "Which class provides information about files and directories (exists, isFile, length...) but has no method to read or write the data inside a file?",
+  "`java.io.File`",
+  ["`FileReader`", "`RandomAccessFile`", "`ObjectInputStream`"],
+  "<b>`java.io.File`</b> chỉ giúp truy cập thông tin file/thư mục (exists, isDirectory, getName, length, delete, mkdir...) chứ không có phương thức đọc/ghi dữ liệu."),
+Q(10, "What are the two abstract superclasses of the character streams?",
+  "`Reader` and `Writer`",
+  ["`InputStream` and `OutputStream`", "`File` and `Directory`", "`Scanner` and `Printer`"],
+  "Luồng ký tự có hai lớp trừu tượng gốc là <b>`Reader`</b> (đọc) và <b>`Writer`</b> (ghi); `InputStream/OutputStream` là gốc của luồng byte."),
+Q(10, "When reading a text file with `BufferedReader`, how do you know the end of the file has been reached with `readLine()`?",
+  "`readLine()` returns `null`",
+  ["`readLine()` returns -1", "`readLine()` returns an empty string", "`readLine()` always throws an exception"],
+  "Theo sơ đồ: `read()` trả về <b>-1</b> khi hết file, còn <b>`readLine()` trả về `null`</b>. Vòng lặp thường là `while ((s = br.readLine()) != null)`."),
+Q(10, "Which class (used together with `FileWriter`) lets you write text lines with `print()` and `println()` to a text file?",
+  "`PrintWriter`",
+  ["`FileInputStream`", "`ObjectInputStream`", "`DataInputStream`"],
+  "<b>`PrintWriter`</b> bọc `FileWriter`, cho phép ghi bằng `write()`, `print()`, `println()`. Ta phải tự thiết kế định dạng dữ liệu trong file."),
+Q(10, "Which `RandomAccessFile` mode opens a file for both reading and writing?",
+  "`rw`",
+  ["`r`", "`w`", "`a`"],
+  "Mode <b>\"r\"</b>: chỉ đọc; <b>\"rw\"</b>: đọc và ghi; \"rws\"/\"rwd\" giống rw nhưng thay đổi được ghi ngay lập tức (rws cả metadata)."),
+Q(10, "Which streams read and write primitive values and strings in binary form?",
+  "`DataInputStream` and `DataOutputStream`",
+  ["`FileReader` and `FileWriter`", "`PrintWriter` and `Scanner`", "`StringBuilder` and `StringBuffer`"],
+  "<b>DataInputStream/DataOutputStream</b> là luồng nhị phân mức cao với các phương thức `readXXX`/`writeXXX`, bọc bên ngoài `FileInputStream/FileOutputStream`."),
+Q(10, "Which interface must a class implement so that its objects can be written with `ObjectOutputStream`?",
+  "`java.io.Serializable`",
+  ["`Comparable`", "`Cloneable`", "`Runnable`"],
+  "Class phải <b>implements `java.io.Serializable`</b> (interface không khai báo phương thức nào). Ví dụ lớp `Product` trong bài practice HashMap."),
+Q(10, "Which fields are NOT written when an object is serialized?",
+  "`static` and `transient` fields",
+  ["`private` fields", "`public` fields", "`final` fields"],
+  "Khi serialization, <b>trường static và transient không được ghi</b>; chỉ dữ liệu của đối tượng được ghi chứ không ghi định nghĩa class."),
+Q(10, "Which method reads an object back from a file (de-serialization), and what must the JVM have access to?",
+  "`readObject()`; the JVM must have access to the object's class definition",
+  ["`readObject()`; the file contains the whole class definition, so nothing else is needed", "`readLine()`; the class must be `static`", "`readUTF()`; the class must be abstract"],
+  "<b>`ObjectInputStream.readObject()`</b> khôi phục đối tượng; vì file chỉ chứa dữ liệu, JVM đọc phải <b>có sẵn định nghĩa class</b> của đối tượng đó.")
+];
+
+/* ====================================================================
+   CODE-READING SETS (Đề 11 & Đề 12) — 25 questions each.
+   Every output below was verified by actually running the Java code.
+   ==================================================================== */
+
+const CODE_SET_11 = [
+CQ("What is printed by this code?",
+`int a = 7, b = 2;
+System.out.println(a / b + " " + (double) a / b);`,
+ "3 3.5", ["3.5 3.5", "3 3.0", "3.5 3"],
+ "`a / b` là phép chia nguyên nên bằng <b>3</b>; `(double) a / b` ép `a` thành double trước khi chia nên bằng <b>3.5</b>. Kết quả: `3 3.5`."),
+CQ("What is printed by this code?",
+`char c = 'A';
+c++;
+System.out.println(c + " " + (c + 1));`,
+ "B 67", ["B C", "66 67", "B 66"],
+ "`c++` biến 'A' (65) thành 'B' (66). `c` in ra là ký tự <b>B</b>, còn `c + 1` được tính trong kiểu int nên là <b>67</b>."),
+CQ("What is printed by this code?",
+`System.out.println(1 + 2 + "A" + 1 + 2);`,
+ "3A12", ["12A12", "3A3", "12A3"],
+ "Toán tử `+` tính từ trái sang phải: `1 + 2 = 3` (số), sau đó gặp chuỗi \"A\" nên các phép `+` còn lại là <b>nối chuỗi</b>: `3` + `A` + `1` + `2` = <b>3A12</b>."),
+CQ("What is printed by this code?",
+`String s1 = "Hello";
+String s2 = "Hello";
+String s3 = new String("Hello");
+System.out.println((s1 == s2) + " " + (s1 == s3) + " " + s1.equals(s3));`,
+ "true false true", ["true true true", "false false true", "true false false"],
+ "Hai literal giống nhau dùng chung trong <b>String pool</b> nên `s1 == s2` là true. `new String(...)` tạo đối tượng mới nên `s1 == s3` (so sánh tham chiếu) là false; còn `equals` so sánh nội dung nên true."),
+CQ("What is printed by this code?",
+`String s = "abc";
+s.toUpperCase();
+System.out.println(s);`,
+ "abc", ["ABC", "null", "Compile error"],
+ "<b>String bất biến</b>: `toUpperCase()` trả về một chuỗi mới, còn `s` vẫn là \"abc\" vì kết quả không được gán lại."),
+CQ("What is printed by this code?",
+`StringBuilder sb = new StringBuilder("abc");
+sb.append("de").reverse();
+System.out.println(sb);`,
+ "edcba", ["abcde", "abcdeedcba", "edcb"],
+ "`StringBuilder` có thể thay đổi: `append(\"de\")` cho \"abcde\", `reverse()` đảo ngược thành <b>edcba</b> (cùng đối tượng)."),
+CQ("What is printed by this code?",
+`Integer wi = 234;
+int times9 = wi * 9;
+System.out.println(times9);`,
+ "2106", ["234", "2160", "Compile error"],
+ "`Integer wi = 234;` là <b>autoboxing</b>; `wi * 9` thực hiện <b>unboxing</b> `wi` về int rồi nhân: 234 × 9 = <b>2106</b>."),
+CQ("What is printed by this code?",
+`System.out.println(Math.ceil(4.2) + " " + Math.floor(4.8) + " " + Math.abs(-3));`,
+ "5.0 4.0 3", ["5 4 3", "4.0 5.0 3", "5.0 4.0 -3"],
+ "`Math.ceil(4.2)` = <b>5.0</b> (làm tròn lên, trả về double), `Math.floor(4.8)` = <b>4.0</b> (làm tròn xuống), `Math.abs(-3)` = <b>3</b> (int)."),
+CQ("What happens when this code is compiled?",
+`double d = 5.5;
+int n = d;
+System.out.println(n);`,
+ "Compile error — narrowing conversion needs an explicit cast", ["It prints 5", "It prints 5.5", "It prints 6"],
+ "<b>Narrowing conversion</b> (double → int) không được phép ngầm: compiler báo 'possible lossy conversion'. Phải viết `int n = (int) d;`."),
+CQ("What is printed by this code?",
+`String[] names = new String[2];
+System.out.println(names[0] + " " + names.length);`,
+ "null 2", ["0 2", "Compile error", "NullPointerException"],
+ "Mảng String mới tạo có các phần tử mặc định là <b>null</b>; nối chuỗi với null cho \"null\" (không ném lỗi). Độ dài mảng là <b>2</b>."),
+CQ("What is printed by this code?",
+`int[] x = {1, 2, 3};
+int[] y = x;
+y[0] = 99;
+System.out.println(x[0]);`,
+ "99", ["1", "0", "Compile error"],
+ "Mảng là <b>đối tượng</b>; `y = x` chỉ sao chép tham chiếu nên `x` và `y` cùng trỏ tới một mảng. Sửa `y[0]` cũng làm đổi `x[0]` → <b>99</b>."),
+CQ("What is printed by this code?",
+`static void change(int x)     { x = 100; }
+static void change(int[] arr) { arr[0] = 100; }
+
+int n = 5;
+int[] arr = {5};
+change(n);
+change(arr);
+System.out.println(n + " " + arr[0]);`,
+ "5 100", ["100 100", "5 5", "100 5"],
+ "Java <b>truyền theo giá trị</b>: `change(n)` chỉ đổi bản sao nên `n` vẫn là 5. Với mảng, bản sao của tham chiếu vẫn trỏ tới cùng một mảng nên `arr[0]` thành <b>100</b>. (Hai phương thức `change` là overloading.)"),
+CQ("What is printed by this code?",
+`class Student {
+    String name;
+    Student(String name) { name = name; }
+}
+...
+System.out.println(new Student("An").name);`,
+ "null", ["An", "Compile error", "An empty string"],
+ "Trong constructor, `name = name` gán <b>tham số cho chính tham số</b> (tên tham số che khuất field), nên field `name` vẫn là null. Phải viết <b>`this.name = name;`</b>."),
+CQ("What happens when this code is compiled?",
+`class P {
+    int x;
+    P(int x) { this.x = x; }
+}
+...
+P p = new P();`,
+ "Compile error — no default constructor is inserted once you declare your own constructor", ["p is created with x = 0", "p is created with x = null", "A runtime exception is thrown"],
+ "Khi class đã có constructor tự viết (có tham số), <b>compiler không chèn constructor mặc định</b>; vì vậy `new P()` không tìm thấy constructor phù hợp."),
+CQ("What happens when this code is compiled?",
+`class A { private int v = 5; }
+
+class Main {
+    public static void main(String[] args) {
+        A obj = new A();
+        System.out.println(obj.v);
+    }
+}`,
+ "Compile error — `v` has private access in `A`", ["It prints 5", "It prints 0", "A runtime exception is thrown"],
+ "Field `private` chỉ truy cập được bên trong class `A`; class `Main` ở bên ngoài nên bị lỗi: <b>'v has private access in A'</b>. Cần dùng getter."),
+CQ("What is printed by this code?",
+`class A { A() { System.out.print("A"); } }
+class B extends A { B() { System.out.print("B"); } }
+...
+new B();`,
+ "AB", ["BA", "B", "A"],
+ "Constructor chạy theo thứ tự <b>từ lớp cha đến lớp con</b>: constructor của `B` ngầm gọi `super()` trước (in A), rồi mới in B → <b>AB</b>."),
+CQ("What is printed by this code?",
+`class A { A(int x) { System.out.print("A" + x); } }
+class B extends A {
+    B() { super(5); System.out.print("B"); }
+}
+...
+new B();`,
+ "A5B", ["BA5", "A5", "Compile error"],
+ "`super(5)` là câu lệnh đầu tiên, gọi constructor của `A` với x = 5 (in A5), sau đó constructor của `B` in B → <b>A5B</b>."),
+CQ("What is printed by this code?",
+`class A { void M() { System.out.print("A"); } }
+class B extends A { void M() { System.out.print("B"); } }
+class C extends B { void M() { System.out.print("C"); } }
+...
+A obj = new C();  obj.M();
+obj = new B();    obj.M();
+obj = new A();    obj.M();`,
+ "CBA", ["AAA", "ABC", "CCC"],
+ "Phương thức được gọi phụ thuộc vào <b>kiểu thực sự (dynamic type)</b> của đối tượng lúc chạy: C, B rồi A → <b>CBA</b>."),
+CQ("What is printed by this code?",
+`class Father1 {
+    public static void m() { System.out.println("I am a father"); }
+}
+class Son1 extends Father1 {
+    public static void m() { System.out.println("I am a son"); }
+}
+...
+Father1 obj = new Son1();
+obj.m();`,
+ "I am a father", ["I am a son", "Compile error", "Nothing is printed"],
+ "Đây là <b>hiding</b> (ẩn phương thức static), không phải overriding. Phương thức static được chọn theo <b>kiểu khai báo</b> của biến (`Father1`), nên in 'I am a father'."),
+CQ("What is printed by this code?",
+`Rectangle r1 = new Box();       // Box extends Rectangle
+Rectangle r2 = new Rectangle();
+System.out.println((r1 instanceof Box) + " " + (r2 instanceof Box));`,
+ "true false", ["true true", "false false", "false true"],
+ "`r1` thực sự trỏ tới đối tượng `Box` nên `r1 instanceof Box` là true; `r2` trỏ tới `Rectangle` (không phải Box) nên là false."),
+CQ("What happens at runtime?",
+`Rectangle r = new Rectangle();
+Box b = (Box) r;      // Box extends Rectangle`,
+ "ClassCastException is thrown", ["b refers to a new Box object", "Compile error", "b is set to null"],
+ "Đoạn code biên dịch được nhưng đối tượng thực sự là `Rectangle`, không phải `Box` nên ép kiểu xuống thất bại → <b>ClassCastException</b>. Vì vậy cần kiểm tra bằng `instanceof` trước khi ép kiểu."),
+CQ("What is wrong with this code?",
+`interface I { void m(); }
+
+class Impl implements I {
+    void m() { System.out.println("M"); }
+}`,
+ "Compile error — weaker access privileges; the method must be `public`", ["Nothing is wrong; it prints M", "Only a compiler warning is shown", "A runtime exception occurs"],
+ "Phương thức trong interface mặc định là <b>public</b>; class cài đặt dùng `void m()` (access mặc định) là <b>giảm quyền truy cập</b> nên lỗi. Phải khai báo `public void m()`."),
+CQ("Why does this code fail to compile?",
+`abstract class AbstractDemo2 {
+    void m1() { System.out.println("m1"); }
+    abstract void m2();
+}
+class Derived extends AbstractDemo2 {
+    public void m1() { System.out.println("m1"); }
+}`,
+ "`Derived` does not implement the abstract method `m2()` and is not declared abstract", ["`m1` cannot be declared public", "An abstract class cannot have concrete methods", "`Derived` must be declared final"],
+ "Lớp con thừa hưởng cả phương thức abstract. `Derived` không override `m2()` và cũng không khai báo `abstract` nên bị lỗi (slide 'Error. Why?')."),
+CQ("What is printed by this code?",
+`abstract class MyAdapter {
+    public void M1() { System.out.print("M1"); }
+    public void M2() { System.out.print("M2"); }
+}
+...
+MyAdapter obj = new MyAdapter() {
+    public void M1() { System.out.print("M1 overridden"); }
+};
+obj.M2();
+obj.M1();`,
+ "M2M1 overridden", ["M1M2", "M1 overriddenM2", "Compile error — an abstract class cannot be instantiated"],
+ "Đây là <b>anonymous class</b> kế thừa abstract class `MyAdapter` và override `M1()`. Gọi `M2()` dùng bản gốc (in M2), gọi `M1()` dùng bản override (in M1 overridden)."),
+CQ("What is printed by this code?",
+`public class Study2 {
+    static int N = 10;
+    int x = 120;
+    static { N = 50; System.out.print("A"); }
+    public void M() { System.out.print(x); }
+    public static void main(String[] args) {
+        Study2 obj = new Study2();
+        obj.M();
+    }
+}`,
+ "A120", ["120A", "120", "Compile error"],
+ "Khối <b>static</b> chạy một lần khi class được nạp, trước `main`, nên in <b>A</b> trước. Sau đó `obj.M()` in giá trị field `x` = 120 → <b>A120</b>.")
+];
+
+const CODE_SET_12 = [
+CQ("What is printed by this code?",
+`try {
+    System.out.print("A");
+    int x = 5 / 0;
+    System.out.print("B");
+} catch (ArithmeticException e) {
+    System.out.print("C");
+} finally {
+    System.out.print("D");
+}
+System.out.print("E");`,
+ "ACDE", ["ABCDE", "ACD", "ADE"],
+ "In A, rồi `5 / 0` ném ArithmeticException nên bỏ qua B; catch in C; <b>finally luôn chạy</b> (D); sau đó chương trình tiếp tục in E → <b>ACDE</b>."),
+CQ("What is printed by this code?",
+`try {
+    String s = null;
+    s.length();
+} catch (NullPointerException e) {
+    System.out.print("NPE");
+} catch (Exception e) {
+    System.out.print("EX");
+}`,
+ "NPE", ["EX", "NPEEX", "Compile error"],
+ "Chỉ <b>catch đầu tiên khớp</b> được thực thi; `NullPointerException` khớp ngay catch thứ nhất nên in NPE, catch còn lại bị bỏ qua."),
+CQ("What happens when this code is compiled?",
+`try {
+    int x = 5 / 0;
+} catch (Exception e) {
+    System.out.println("EX");
+} catch (ArithmeticException e) {
+    System.out.println("AE");
+}`,
+ "Compile error — ArithmeticException has already been caught by the general Exception", ["It prints EX", "It prints AE", "It prints EX and then AE"],
+ "Catch tổng quát (`Exception`) đặt trước làm catch cụ thể phía sau <b>không bao giờ đạt tới</b>, nên compiler báo 'has already been caught'. Phải đặt catch cụ thể trước."),
+CQ("What is printed by this code?",
+`class InvalidAge extends Exception {
+    public InvalidAge(String mes) { super(mes); }
+}
+static void check(int a) throws InvalidAge {
+    if (a < 0) throw new InvalidAge("Age invalid!");
+}
+...
+try {
+    check(-5);
+    System.out.println("OK");
+} catch (InvalidAge ex) {
+    System.out.println(ex.getMessage());
+}`,
+ "Age invalid!", ["OK", "InvalidAge", "Compile error"],
+ "`check(-5)` ném `InvalidAge` nên dòng in OK bị bỏ qua; catch in thông điệp qua `ex.getMessage()` = <b>Age invalid!</b>."),
+CQ("What happens when this code is compiled?",
+`static void m() {
+    throw new Exception("x");
+}`,
+ "Compile error — unreported checked exception: handle it or declare `throws Exception`", ["It compiles; the Exception is thrown at runtime", "It compiles with a warning only", "It compiles only if the method is called from main"],
+ "`Exception` là <b>checked exception</b>: phải xử lý bằng try-catch hoặc khai báo `throws Exception` trong chữ ký phương thức, nếu không compiler báo 'unreported exception'."),
+CQ("What happens at runtime?",
+`int[] a = new int[3];
+a[3] = 1;`,
+ "ArrayIndexOutOfBoundsException is thrown", ["a[3] becomes 1", "The array is resized automatically", "Compile error"],
+ "Mảng 3 phần tử có chỉ số hợp lệ là 0, 1, 2. Truy cập `a[3]` ném <b>ArrayIndexOutOfBoundsException</b> (một unchecked/runtime exception)."),
+CQ("What is printed by this code?",
+`ArrayList<Integer> list = new ArrayList<>();
+list.add(10);
+list.add(20);
+list.add(1, 15);
+System.out.println(list);`,
+ "[10, 15, 20]", ["[10, 20, 15]", "[15, 10, 20]", "[10, 20]"],
+ "`add(int index, E e)` chèn phần tử vào vị trí chỉ số 1 và dồn phần tử sau ra sau: [10, 20] → <b>[10, 15, 20]</b>."),
+CQ("What is printed by this code?",
+`List<Integer> l = new ArrayList<>(Arrays.asList(10, 20, 30));
+l.remove(1);
+l.remove(Integer.valueOf(10));
+System.out.println(l);`,
+ "[30]", ["[20, 30]", "[10, 30]", "[]"],
+ "`remove(1)` là <b>remove(int index)</b> → xóa phần tử ở chỉ số 1 (20) còn [10, 30]. `remove(Integer.valueOf(10))` là <b>remove(Object)</b> → xóa giá trị 10 còn <b>[30]</b>."),
+CQ("What is printed by this code?",
+`Set<String> s = new HashSet<>();
+s.add("a");
+s.add("b");
+s.add("a");
+System.out.println(s.size());`,
+ "2", ["3", "1", "0"],
+ "<b>Set không chứa phần tử trùng</b>: lần `add(\"a\")` thứ hai bị bỏ qua nên chỉ còn 2 phần tử."),
+CQ("What is printed by this code?",
+`class Pt {
+    int x, y;
+    Pt(int x, int y) { this.x = x; this.y = y; }
+}   // no equals() / hashCode() override
+...
+Set<Pt> set = new HashSet<>();
+set.add(new Pt(10, 20));
+set.add(new Pt(10, 20));
+System.out.println(set.size());`,
+ "2", ["1", "0", "Compile error"],
+ "Set kiểm tra trùng bằng <b>equals()</b> (và hashCode). Lớp `Pt` không override chúng nên hai đối tượng được coi là khác nhau → size = <b>2</b>. Ví dụ trong slide ra 1 vì lớp Point có định nghĩa so sánh bằng."),
+CQ("What is printed by this code?",
+`TreeSet<String> ts = new TreeSet<>();
+ts.add("banana");
+ts.add("apple");
+ts.add("Cherry");
+System.out.println(ts);`,
+ "[Cherry, apple, banana]", ["[apple, banana, Cherry]", "[banana, apple, Cherry]", "[Cherry, banana, apple]"],
+ "TreeSet sắp xếp chuỗi theo thứ tự <b>từ điển (lexicographic)</b> dựa trên mã Unicode: chữ hoa ('C' = 67) đứng trước chữ thường ('a' = 97) → <b>[Cherry, apple, banana]</b>."),
+CQ("What is printed by this code?",
+`Map<String, Integer> m = new HashMap<>();
+m.put("a", 1);
+m.put("b", 2);
+m.put("a", 3);
+System.out.println(m.size() + " " + m.get("a"));`,
+ "2 3", ["3 3", "2 1", "3 1"],
+ "Key trong Map là duy nhất: `put(\"a\", 3)` <b>ghi đè</b> value cũ của key \"a\". Map có 2 entry và `get(\"a\")` = 3 → <b>2 3</b>."),
+CQ("What is printed by this code?",
+`Map<String, Integer> m = new HashMap<>();
+m.put("a", 1);
+m.putIfAbsent("a", 99);
+m.putIfAbsent("b", 2);
+System.out.println(m.get("a") + " " + m.get("b"));`,
+ "1 2", ["99 2", "1 null", "99 null"],
+ "`putIfAbsent` chỉ thêm khi key <b>chưa có</b>: key \"a\" đã tồn tại nên giữ nguyên 1; key \"b\" chưa có nên được thêm với 2 → <b>1 2</b>."),
+CQ("What is printed by this code?",
+`TreeMap<String, Integer> tm = new TreeMap<>();
+tm.put("b", 2);
+tm.put("a", 1);
+tm.put("c", 3);
+System.out.println(tm.keySet());`,
+ "[a, b, c]", ["[b, a, c]", "[c, b, a]", "[1, 2, 3]"],
+ "<b>TreeMap</b> lưu các key theo <b>thứ tự tự nhiên</b> (tăng dần) nên `keySet()` cho [a, b, c], bất kể thứ tự put."),
+CQ("What is printed by this code?",
+`TreeSet<Integer> set = new TreeSet<>(Arrays.asList(30, 10, 20));
+Iterator<Integer> it = set.iterator();
+while (it.hasNext()) {
+    System.out.print(it.next() + " ");
+}`,
+ "10 20 30", ["30 10 20", "30 20 10", "20 10 30"],
+ "TreeSet lưu phần tử theo thứ tự tăng dần; Iterator duyệt qua lần lượt bằng `hasNext()`/`next()` nên in <b>10 20 30</b>."),
+CQ("What is printed by this code?",
+`List<Integer> l = Arrays.asList(3, 1, 2);
+Collections.sort(l, Collections.reverseOrder());
+System.out.println(l);`,
+ "[3, 2, 1]", ["[1, 2, 3]", "[3, 1, 2]", "[2, 1, 3]"],
+ "`Collections.reverseOrder()` đảo thứ tự tự nhiên nên danh sách được sắp <b>giảm dần</b>: [3, 2, 1]."),
+CQ("What is printed by this code?",
+`List<Integer> l = Arrays.asList(8, 3, 8, 1, 8);
+System.out.println(Collections.frequency(l, 8) + " "
+        + Collections.max(l) + " " + Collections.min(l));`,
+ "3 8 1", ["3 1 8", "5 8 1", "8 3 1"],
+ "`frequency(l, 8)` = số lần 8 xuất hiện = <b>3</b>; `max` = <b>8</b>; `min` = <b>1</b>."),
+CQ("What is printed by this code?",
+`List<Integer> l = Arrays.asList(1, 3, 5, 7);
+int p1 = Collections.binarySearch(l, 7);
+int p2 = Collections.binarySearch(l, 4);
+System.out.println(p1 + " " + (p2 < 0));`,
+ "3 true", ["7 true", "3 false", "-1 true"],
+ "Danh sách đã sắp tăng dần. 7 nằm ở chỉ số <b>3</b> nên `p1 = 3`. 4 không có trong danh sách nên `p2 < 0` (Absent) → <b>true</b>."),
+CQ("What is printed by this code?",
+`int[] ar2 = {5, 6, 7, 8, 9};
+int[] ar3 = {5, 6, 7, 8, 9};
+System.out.println((ar2 == ar3) + " " + Arrays.equals(ar2, ar3));`,
+ "false true", ["true true", "true false", "false false"],
+ "`==` so sánh <b>tham chiếu</b>: hai mảng là hai đối tượng khác nhau nên false. `Arrays.equals` so sánh <b>nội dung</b> từng phần tử nên true (đúng như demo ar2/ar3 trong slide)."),
+CQ("After this sort (descending salary, then ascending ID), in which order do the employees appear?",
+`// employees: (ID004, 400), (ID001, 200), (ID003, 400)
+Collections.sort(list, new Comparator<Employee>() {
+    public int compare(Employee e1, Employee e2) {
+        int d = e1.salary - e2.salary;
+        if (d > 0) return -1;
+        if (d == 0) return e1.ID.compareTo(e2.ID);
+        return 1;
+    }
+});`,
+ "ID003, ID004, ID001", ["ID001, ID003, ID004", "ID004, ID003, ID001", "ID001, ID004, ID003"],
+ "Lương cao hơn đứng trước (trả về -1 khi `d > 0`); lương bằng nhau (400) thì so ID tăng dần: ID003 trước ID004; lương 200 (ID001) đứng cuối → <b>ID003, ID004, ID001</b>."),
+CQ("What is printed by this code?",
+`class Book implements Serializable {
+    String title;
+    transient double price;
+    ...
+}
+// (inside a method that declares: throws Exception)
+// write new Book("Java", 99.5) with ObjectOutputStream,
+// then read it back with ObjectInputStream.readObject()
+System.out.println(b.title + " " + b.price);`,
+ "Java 0.0", ["Java 99.5", "null 0.0", "Java null"],
+ "Trường <b>transient</b> không được serialize nên sau khi đọc lại, `price` nhận <b>giá trị mặc định 0.0</b>; `title` được khôi phục là Java."),
+CQ("What happens when `writeObject` is called?",
+`class Plain { String s; }     // does NOT implement Serializable
+...
+// (inside a method that declares: throws Exception)
+ObjectOutputStream oos =
+        new ObjectOutputStream(new FileOutputStream(f));
+oos.writeObject(new Plain());`,
+ "A NotSerializableException is thrown", ["The object is written normally", "Compile error", "Only the class name is written"],
+ "Muốn ghi đối tượng bằng ObjectOutputStream, class phải <b>implements Serializable</b> (như `Product` trong bài practice). Nếu không, JVM ném <b>NotSerializableException</b> lúc chạy."),
+CQ("What is printed by this code, if data.txt contains 3 lines (a, b, c)?",
+`// (inside a method that declares: throws IOException)
+int cnt = 0;
+BufferedReader br = new BufferedReader(new FileReader("data.txt"));
+String line;
+while ((line = br.readLine()) != null) {
+    cnt++;
+}
+System.out.println(cnt);`,
+ "3", ["4", "2", "0"],
+ "`readLine()` trả về từng dòng và trả về <b>null</b> khi hết file, nên vòng lặp chạy đúng 3 lần → cnt = <b>3</b>."),
+CQ("After the last line executes, which statement is true?",
+`Object obj1 = new Object();
+int x = 5;
+if (x < 10) {
+    Object obj2 = new Object();
+    int y = 3;
+}
+int t = 7;
+obj1 = null;
+t *= 8;`,
+ "Both objects are garbage: obj2 is out of scope and obj1 was set to null", ["Only obj2 is garbage", "Only obj1 is garbage", "Neither is garbage until the program ends"],
+ "Theo slide Garbage Collection: `obj2` và `y` <b>ra khỏi phạm vi</b> sau dấu `}` của khối if; `obj1 = null` làm vùng nhớ của obj1 <b>không còn được dùng</b>. Cả hai đối tượng đều thành rác."),
+CQ("Is the Student object eligible for garbage collection after the last line?",
+`Student a = new Student("An");
+Student b = a;
+a = null;`,
+ "No — it is still referenced by b", ["Yes — a is null", "Yes — the object is deleted immediately", "No — objects are never collected"],
+ "Đối tượng chỉ trở thành rác khi <b>không còn tham chiếu nào</b> tới nó. `b` vẫn trỏ tới đối tượng 'An' nên nó vẫn đang được dùng.")
+];
+
+/* ============================= BUILD SETS ============================= */
+function fmt(s){
+  return s.replace(/`([^`]+)`/g, '<code class="ic">$1</code>');
+}
+function escapeHtml(str){
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function buildSets(){
+  // group pool by category
+  const byCat = {};
+  POOL.forEach(q=>{
+    if(!byCat[q.cat]) byCat[q.cat]=[];
+    byCat[q.cat].push(q);
+  });
+  // shuffle each category's question order independently
+  Object.keys(byCat).forEach(k=> byCat[k] = shuffle(byCat[k]));
+
+  const categories = Object.keys(byCat).map(Number).sort((a,b)=>a-b);
+  const numSets = 10;
+  const sets = [];
+
+  for(let s=0; s<numSets; s++){
+    let setQuestions = categories.map(cat => byCat[cat][s]); // one Q per category per set
+    setQuestions = shuffle(setQuestions); // jumble topic order within the set
+    // shuffle each question's options, remapping the correct index
+    setQuestions = setQuestions.map(q=>{
+      const optIdx = shuffle(q.options.map((_,i)=>i));
+      const newOptions = optIdx.map(i=>q.options[i]);
+      const newCorrect = optIdx.indexOf(q.correct);
+      return {
+        cat:q.cat,
+        catName:CATEGORY_NAMES[q.cat],
+        question:q.q,
+        options:newOptions,
+        correct:newCorrect,
+        exp:q.exp
+      };
+    });
+    sets.push(setQuestions);
+  }
+  return sets;
+}
+
+function formatCodeSet(catName, questions){
+  return questions.map(q=>{
+    const optIdx = shuffle(q.options.map((_,i)=>i));
+    const newOptions = optIdx.map(i=>q.options[i]);
+    const newCorrect = optIdx.indexOf(q.correct);
+    return {
+      cat:null,
+      catName:catName,
+      question:q.q,
+      code:q.code,
+      options:newOptions,
+      correct:newCorrect,
+      exp:q.exp
+    };
+  });
+}
+
+const SETS = buildSets().concat([
+  formatCodeSet("Code Reading — Java Basics, Strings & OOP", CODE_SET_11),
+  formatCodeSet("Code Reading — Exceptions, Collections & File I/O", CODE_SET_12)
+]);
+const state = {
+  currentSet: null,
+  qIndex: 0,
+  answers: [] // {chosen, correct}
+};
+
+/* ============================= RENDER: SET PICKER ============================= */
+const setGrid = document.getElementById('setGrid');
+const setResults = new Array(SETS.length).fill(null); // stores {score,total} once completed
+
+function renderSetGrid(){
+  setGrid.innerHTML = '';
+  SETS.forEach((set, idx)=>{
+    const btn = document.createElement('button');
+    btn.className = 'set-btn';
+    if(state.currentSet === idx) btn.classList.add('active');
+    if(setResults[idx]) btn.classList.add('done');
+    const isCodeSet = idx >= 10;
+    const setName = isCodeSet ? 'Code Reading Set' : 'Mixed Practice Set';
+    btn.innerHTML = `
+      <span class="num">ĐỀ ${idx+1}</span>
+      <span class="name">${setName}</span>
+      <span class="score">${setResults[idx] ? `Score: ${setResults[idx].score}/${setResults[idx].total}` : `${set.length} questions`}</span>
+    `;
+    btn.addEventListener('click', ()=> startSet(idx));
+    setGrid.appendChild(btn);
+  });
+}
+
+/* ============================= RENDER: QUIZ ============================= */
+const panel = document.getElementById('panel');
+
+function startSet(idx){
+  state.currentSet = idx;
+  state.qIndex = 0;
+  state.answers = new Array(SETS[idx].length).fill(null);
+  renderSetGrid();
+  renderQuestion();
+}
+
+function renderProgressDots(){
+  const set = SETS[state.currentSet];
+  let html = '<div class="progress-track">';
+  set.forEach((q,i)=>{
+    let cls = 'dot';
+    const a = state.answers[i];
+    if(a){ cls += a.correctFlag ? ' answered-correct' : ' answered-wrong'; }
+    if(i === state.qIndex) cls += ' current';
+    html += `<span class="${cls}"></span>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderQuestion(){
+  const setIdx = state.currentSet;
+  const set = SETS[setIdx];
+  const qi = state.qIndex;
+
+  if(qi >= set.length){
+    renderResult();
+    return;
+  }
+
+  const q = set[qi];
+  const answered = state.answers[qi];
+
+  const codeHtml = q.code ? `<pre class="code-block"><code>${escapeHtml(q.code)}</code></pre>` : '';
+
+  let optionsHtml = '';
+  q.options.forEach((opt, i)=>{
+    const letter = String.fromCharCode(65+i);
+    let cls = 'option';
+    let disabledAttr = '';
+    if(answered){
+      disabledAttr = 'disabled';
+      if(i === q.correct) cls += ' correct';
+      else if(i === answered.chosen) cls += ' wrong';
+      else cls += ' muted';
+    }
+    optionsHtml += `
+      <button class="${cls}" data-idx="${i}" ${disabledAttr}>
+        <span class="letter">${letter}</span>
+        <span>${fmt(opt)}</span>
+      </button>
+    `;
+  });
+
+  panel.innerHTML = `
+    <div class="panel-head">
+      <h2>Đề ${setIdx+1} — Câu ${qi+1} / ${set.length}</h2>
+      ${renderProgressDots()}
+    </div>
+    <div class="q-body">
+      <span class="q-tag">${q.catName}</span>
+      <p class="q-text">${fmt(q.question)}</p>
+      ${codeHtml}
+      <div class="options">${optionsHtml}</div>
+      <div class="feedback ${answered ? 'show ' + (answered.correctFlag?'correct':'wrong') : ''}" id="feedback">
+        ${answered ? `
+          <p class="verdict">${answered.correctFlag ? 'Chính xác! ✓' : 'Chưa đúng ✗'}</p>
+          <p class="exp">${fmt(q.exp)}</p>
+        ` : ''}
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn" id="nextBtn" ${answered ? '' : 'disabled'}>
+        ${qi === set.length-1 ? 'Xem kết quả' : 'Câu tiếp theo →'}
+      </button>
+    </div>
+  `;
+
+  panel.querySelectorAll('.option').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(state.answers[qi]) return; // already answered
+      const chosen = parseInt(btn.dataset.idx,10);
+      const correctFlag = chosen === q.correct;
+      state.answers[qi] = {chosen, correctFlag};
+      renderQuestion();
+    });
+  });
+
+  const nextBtn = document.getElementById('nextBtn');
+  if(nextBtn){
+    nextBtn.addEventListener('click', ()=>{
+      state.qIndex++;
+      renderQuestion();
+    });
+  }
+}
+
+function renderResult(){
+  const setIdx = state.currentSet;
+  const set = SETS[setIdx];
+  const score = state.answers.filter(a=>a && a.correctFlag).length;
+  setResults[setIdx] = {score, total: set.length};
+  renderSetGrid();
+
+  let msg;
+  if(score === set.length) msg = "Xuất sắc! Bạn đã trả lời đúng toàn bộ.";
+  else if(score >= set.length*0.7) msg = "Khá tốt! Xem lại một vài câu chưa chắc nhé.";
+  else msg = "Nên ôn lại kiến thức và thử lại đề này.";
+
+  panel.innerHTML = `
+    <div class="result">
+      <p class="big">${score} <span>/ ${set.length}</span></p>
+      <p>${msg}</p>
+      <div class="actions">
+        <button class="btn" id="retryBtn">Làm lại đề ${setIdx+1}</button>
+        <button class="btn ghost" id="backBtn">Chọn đề khác</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('retryBtn').addEventListener('click', ()=> startSet(setIdx));
+  document.getElementById('backBtn').addEventListener('click', ()=>{
+    state.currentSet = null;
+    renderSetGrid();
+    panel.innerHTML = '<div class="empty">Chọn một đề ở trên để bắt đầu làm bài. →</div>';
+  });
+}
+
+renderSetGrid();
+</script>
+</body>
+</html>
